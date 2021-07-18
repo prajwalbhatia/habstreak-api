@@ -1,5 +1,4 @@
 import Streak from '../models/streak.js';
-// import Savedsnippet from '../models/savedSnippets.js';
 import mongoose from 'mongoose';
 
 export const getStreaks = async (req, res) => {

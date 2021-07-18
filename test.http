@@ -3,7 +3,7 @@
 @port = 5000
 @host = {{hostname}}:{{port}}
 @contentType = application/json
-@id = 60f150641c1b136ab6215f1c
+@id = 60f3ee61956d6572261c2d26
 
 
 ###CREATE A STREAK
@@ -13,7 +13,7 @@ Content-Type: {{contentType}}
 {
   "title" : "100 days of javascript",
   "days" : "100",
-  "description" : "The motive is to cover the fundamantals"
+  "description" : "The motive is to cover the fundamantals",
 }
 
 ####GET STREAKS
@@ -32,4 +32,32 @@ Content-Type: {{contentType}}
   "title" : "10 days of javascript",
   "days" : "10",
   "description" : "The motive is to cover the fundamantals"
+}
+
+
+###CREATE STREAK DETAIL
+POST  http://{{host}}/streakDetail HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "date" : "1626458086485",
+  "streakId" : "60f1ca55cf75426f325ad773",
+  "rewards" : ["face"],
+  "reward" : true
+}
+
+####GET STREAK DETAIL
+GET http://{{host}}/streakDetail/{{id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+
+###UPDATE STREAK
+PATCH  http://{{host}}/streakDetail/{{id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "date" : "1626458086485",
+  "streakId" : "60f1ca55cf75426f325ad773",
+  "rewards" : [],
+  "reward" : false
 }
