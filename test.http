@@ -3,7 +3,7 @@
 @port = 5000
 @host = {{hostname}}:{{port}}
 @contentType = application/json
-@id = 60f3ee61956d6572261c2d26
+@id = 60f7c8b330718d13cd20ba6d
 
 
 ###CREATE A STREAK
@@ -51,7 +51,7 @@ GET http://{{host}}/streakDetail/{{id}} HTTP/1.1
 Content-Type: {{contentType}}
 
 
-###UPDATE STREAK
+###UPDATE STREAK DETAIL
 PATCH  http://{{host}}/streakDetail/{{id}} HTTP/1.1
 Content-Type: {{contentType}}
 
@@ -61,3 +61,38 @@ Content-Type: {{contentType}}
   "rewards" : [],
   "reward" : false
 }
+
+
+###DELETE STREAK DETAIL
+DELETE http://{{host}}/streakDetail/{{id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+
+###CREATE REWARD
+POST  http://{{host}}/reward HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "title" : "Buy Monitor",
+  "streakId" : "60f1ca55cf75426f325ad773",
+  "date" : "1626458086485"
+}
+
+####GET REWARDS
+GET http://{{host}}/reward HTTP/1.1
+Content-Type: {{contentType}}
+
+
+###UPDATE REWARD
+PATCH  http://{{host}}/reward/{{id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "title" : "Buy Monitor12",
+  "streakId" : "60f1ca55cf75426f325ad773",
+  "date" : "1626458086485"
+}
+
+###DELETE REWARD
+DELETE http://{{host}}/reward/{{id}} HTTP/1.1
+Content-Type: {{contentType}}

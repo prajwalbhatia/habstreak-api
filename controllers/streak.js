@@ -65,11 +65,11 @@ export const updateStreak = async (req, res) => {
     console.warn(error)
     if (error.kind === 'ObjectId') {
       return res.status(404).json({
-        message: `Streak not found with id ${streakId}`
+        message: `Streak not found with id ${_id}`
       });
     }
     return res.status(500).send({
-      message: `Error updating streak with id ${streakId}`
+      message: `Error updating streak with id ${id}`
     });
   }
 }

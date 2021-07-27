@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/users.js';
 import streakRoutes from './routes/streak.js';
 import streakDetailRoutes from './routes/streakDetail.js';
+import rewardRoute from './routes/reward.js';
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cors());
 // app.use('/user' , userRoutes);
 app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
+app.use('/reward', rewardRoute);
 
 app.get('/', (req, res) => {
   res.send('Welcome to Code snippet');
