@@ -1,7 +1,9 @@
 import StreakDetail from "../models/streakDetail.js";
 import Streak from '../models/streak.js';
+import Reward from '../models/reward.js';
 
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 import cron from 'node-cron';
 
@@ -46,9 +48,30 @@ cron.schedule('00 00 * * *', async () => {
 
 
 export const createStreakDetail = async (req, res) => {
-  const streakDetail = req.body;
-  const createStreakDetail = new StreakDetail(streakDetail);
   try {
+    const streakDetail = req.body;
+    //Before creating streak detail we have to check
+    //if that detail of a particular streak is
+    //having any reward assosiate with it or not
+    //if yes then make sone changes in strak details value
+    //and then save the data
+    const rewards = await Reward.find().lean(); //Converting the mongo document into simple object
+
+    //Filtering the reward list according to the data 
+    //that user has send
+    const filterRewardList = rewards.filter((reward) => {
+      const modifiedReward = JSON.parse(JSON.stringify(reward));
+      if (modifiedReward.streakId === streakDetail.streakId && moment(moment(modifiedReward.date).format('YYYY-MM-DD')).isSame(moment(streakDetail.date).format('YYYY-MM-DD'))) {
+        return reward;
+      }
+    });
+
+    if (filterRewardList.length > 0) {
+      streakDetail.rewards = filterRewardList.map((reward) => reward.title);
+      streakDetail.reward = true;
+    }
+
+    const createStreakDetail = new StreakDetail(streakDetail);
     await createStreakDetail.save();
     res.status(201).json(createStreakDetail);
   } catch (error) {
@@ -97,7 +120,7 @@ export const updateStreakDetail = async (req, res) => {
 export const deleteStreakDetail = async (req, res) => {
   const { streakId } = req.params;
   try {
-    const streakDetail = await StreakDetail.deleteMany({streakId});
+    const streakDetail = await StreakDetail.deleteMany({ streakId });
 
     if (!streakDetail) {
       return res.status(404).json({

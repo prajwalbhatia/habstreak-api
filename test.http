@@ -3,7 +3,7 @@
 @port = 5000
 @host = {{hostname}}:{{port}}
 @contentType = application/json
-@id = 60f7c8b330718d13cd20ba6d
+@id = 61045492f997a47a057b04e3
 
 
 ###CREATE A STREAK
@@ -40,10 +40,10 @@ POST  http://{{host}}/streakDetail HTTP/1.1
 Content-Type: {{contentType}}
 
 {
-  "date" : "1626458086485",
-  "streakId" : "60f1ca55cf75426f325ad773",
-  "rewards" : ["face"],
-  "reward" : true
+  "date" : "2021-08-01T00:00:00.000Z",
+  "streakId" : "61045492f997a47a057b04e3",
+  "rewards" : [],
+  "reward" : false
 }
 
 ####GET STREAK DETAIL
