@@ -7,6 +7,41 @@ import moment from 'moment';
 
 import cron from 'node-cron';
 
+
+/**
+ * 
+ * @param {Object} streakDetail - object containing the streak detail data
+ * @returns - modified streak detail object
+ */
+const modifyingStreakDetail = async (streakDetail) => {
+  try {
+    //Before creating streak detail we have to check
+    //if that detail of a particular streak is
+    //having any reward assosiate with it or not
+    //if yes then make sone changes in strak details value
+    //and then save the data
+    const rewards = await Reward.find().lean(); //Converting the mongo document into simple object
+
+    //Filtering the reward list according to the data 
+    //that user has send
+    const filterRewardList = rewards.filter((reward) => {
+      const modifiedReward = JSON.parse(JSON.stringify(reward));
+      if (modifiedReward.streakId === streakDetail.streakId && moment(moment(modifiedReward.date).format('YYYY-MM-DD')).isSame(moment(streakDetail.date).format('YYYY-MM-DD'))) {
+        return reward;
+      }
+    });
+
+    if (filterRewardList.length > 0) {
+      streakDetail.rewards = filterRewardList.map((reward) => reward.title);
+      streakDetail.reward = true;
+    }
+    return streakDetail;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 //We want to create a new streak detail every day
 //if that particular streak is capable of (means they have not reached the limit of the days of streak)
 //therefore scheduling a task for everyday 24:00
@@ -46,40 +81,6 @@ cron.schedule('01 00 * * *', async () => {
   scheduled: true,
   timezone: "Asia/Kolkata"
 });
-
-/**
- * 
- * @param {Object} streakDetail - object containing the streak detail data
- * @returns - modified streak detail object
- */
-const modifyingStreakDetail = async (streakDetail) => {
-  try {
-    //Before creating streak detail we have to check
-    //if that detail of a particular streak is
-    //having any reward assosiate with it or not
-    //if yes then make sone changes in strak details value
-    //and then save the data
-    const rewards = await Reward.find().lean(); //Converting the mongo document into simple object
-
-    //Filtering the reward list according to the data 
-    //that user has send
-    const filterRewardList = rewards.filter((reward) => {
-      const modifiedReward = JSON.parse(JSON.stringify(reward));
-      if (modifiedReward.streakId === streakDetail.streakId && moment(moment(modifiedReward.date).format('YYYY-MM-DD')).isSame(moment(streakDetail.date).format('YYYY-MM-DD'))) {
-        return reward;
-      }
-    });
-
-    if (filterRewardList.length > 0) {
-      streakDetail.rewards = filterRewardList.map((reward) => reward.title);
-      streakDetail.reward = true;
-    }
-    return streakDetail;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-}
 
 
 export const createStreakDetail = async (req, res) => {

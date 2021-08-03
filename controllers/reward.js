@@ -47,6 +47,31 @@ export const deleteReward = async (req, res) => {
   }
 }
 
+export const deleteRewardsBulk = async (req, res) => {
+  const {streakId} = req.params;
+  try {
+    const reward = await Reward.deleteMany({ streakId });
+
+    if (!reward) {
+      return res.status(404).json({
+        message: `Reward not found with id ${streakId}`
+      })
+    }
+
+    res.status(201).json({ message: "Rewards deleted successfully" });
+  } catch (error) {
+    console.warn(error)
+    if (error.kind === 'ObjectId' || err.name === 'NotFound') {
+      return res.status(404).json({
+        message: `Reward not found with id ${streakId}`
+      });
+    }
+    return res.status(500).send({
+      message: `Could not delete the reward with id ${streakId}`
+    });
+  }
+}
+
 export const updateReward = async (req, res) => {
   const { id: _id } = req.params;
   // if (!req.userId) return res.json({ message: 'Unauthenticated' });

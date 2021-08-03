@@ -1,4 +1,6 @@
 import Streak from '../models/streak.js';
+import StreakDetail from "../models/streakDetail.js";
+
 import mongoose from 'mongoose';
 
 export const getStreaks = async (req, res) => {
@@ -31,7 +33,11 @@ export const deleteStreak = async (req, res) => {
       return res.status(404).json({
         message: `Streak not found with id ${streakId}`
       })
-    }
+    } 
+
+    //Deleting streak detail realated to streak
+    await StreakDetail.deleteMany({ streakId });
+
 
     res.status(201).json({ message: "Streak deleted successfully" });
   } catch (error) {

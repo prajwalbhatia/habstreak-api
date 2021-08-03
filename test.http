@@ -3,7 +3,7 @@
 @port = 5000
 @host = {{hostname}}:{{port}}
 @contentType = application/json
-@id = 61045492f997a47a057b04e3
+@id = 6109885d3a47696c4acbfb3f
 
 
 ###CREATE A STREAK
@@ -40,8 +40,8 @@ POST  http://{{host}}/streakDetail HTTP/1.1
 Content-Type: {{contentType}}
 
 {
-  "date" : "2021-08-01T00:00:00.000Z",
-  "streakId" : "61045492f997a47a057b04e3",
+  "date" : "2021-08-03T00:00:00.000Z",
+  "streakId" : "61097dc29a9b9e41d712607e",
   "rewards" : [],
   "reward" : false
 }
@@ -95,4 +95,9 @@ Content-Type: {{contentType}}
 
 ###DELETE REWARD
 DELETE http://{{host}}/reward/{{id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+
+###DELETE REWARDS BY STREAK ID
+DELETE http://{{host}}/reward/{{id}}/bulk HTTP/1.1
 Content-Type: {{contentType}}
