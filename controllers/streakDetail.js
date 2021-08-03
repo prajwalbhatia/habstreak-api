@@ -10,31 +10,32 @@ import cron from 'node-cron';
 //We want to create a new streak detail every day
 //if that particular streak is capable of (means they have not reached the limit of the days of streak)
 //therefore scheduling a task for everyday 24:00
-cron.schedule('00 00 * * *', async () => {
+cron.schedule('01 00 * * *', async () => {
   try {
     //Finding the streaks
-    const streaks = await Streak.find();
+    const streaks = await Streak.find().lean();
     const filterStreakData = []
     //Filtering the data to get the id of strek and no. of days
     await streaks.forEach(data => {
-      filterStreakData.push({ days: data.days, id: data._id });
+      filterStreakData.push({ days: data.days, id: JSON.parse(JSON.stringify(data._id)) });
     });
 
     filterStreakData.map(async (detail) => {
       //Getting the detail of streaks that was filtered
-      const streakDetail = await StreakDetail.find({ streakId: detail.id });
+      const streakDetail = await StreakDetail.find({ streakId: detail.id }).lean();
       //We want to create a new detail item if only that particular streak
       //have capability of having more detail item
       if (streakDetail.length < +detail.days) {
         const lastData = streakDetail[streakDetail.length - 1];
         let date = new Date();
         const detailObj = {
-          date: date.setDate(date.getDate() + 1),
+          date: date.setDate(date.getDate()),
           streakId: detail.id,
           rewards: [],
         };
         //Creating streak detail
-        const createStreakDetail = new StreakDetail(detailObj);
+        const modifyingDetail = await modifyingStreakDetail(detailObj);
+        const createStreakDetail = new StreakDetail(modifyingDetail);
         await createStreakDetail.save();
       }
     })
@@ -46,10 +47,13 @@ cron.schedule('00 00 * * *', async () => {
   timezone: "Asia/Kolkata"
 });
 
-
-export const createStreakDetail = async (req, res) => {
+/**
+ * 
+ * @param {Object} streakDetail - object containing the streak detail data
+ * @returns - modified streak detail object
+ */
+const modifyingStreakDetail = async (streakDetail) => {
   try {
-    const streakDetail = req.body;
     //Before creating streak detail we have to check
     //if that detail of a particular streak is
     //having any reward assosiate with it or not
@@ -70,8 +74,19 @@ export const createStreakDetail = async (req, res) => {
       streakDetail.rewards = filterRewardList.map((reward) => reward.title);
       streakDetail.reward = true;
     }
+    return streakDetail;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
 
-    const createStreakDetail = new StreakDetail(streakDetail);
+
+export const createStreakDetail = async (req, res) => {
+  try {
+    const streakDetail = req.body;
+    const modifyingDetail = await modifyingStreakDetail(streakDetail);
+    const createStreakDetail = new StreakDetail(modifyingDetail);
     await createStreakDetail.save();
     res.status(201).json(createStreakDetail);
   } catch (error) {
