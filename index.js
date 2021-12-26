@@ -4,11 +4,11 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-import userRoutes from './routes/users.js';
+
+//ROUTES
 import streakRoutes from './routes/streak.js';
 import streakDetailRoutes from './routes/streakDetail.js';
 import rewardRoute from './routes/reward.js';
-
 
 const app = express();
 dotenv.config();
@@ -16,10 +16,15 @@ dotenv.config();
 //Middlewares
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
+// app.use(session({
+//   secret: 'thisissecret',
+//   resave: false,
+//   saveUninitialized: false
+// }))
+
 app.use(cors());
 
 //Routes
-// app.use('/user' , userRoutes);
 app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
 app.use('/reward', rewardRoute);

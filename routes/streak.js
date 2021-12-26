@@ -1,4 +1,5 @@
 import express from 'express';
+import isUserAuthenticated from '../middleware/auth.js';
 
 import auth from "../middleware/auth.js";
 
@@ -7,9 +8,9 @@ import { createStreak, getStreaks, deleteStreak, updateStreak } from './../contr
 
 const router = express.Router();
 
-router.post('/', createStreak);
-router.get('/', getStreaks);
-router.delete('/:id', deleteStreak);
-router.patch('/:id', updateStreak);
+router.post('/', isUserAuthenticated , createStreak);
+router.get('/', isUserAuthenticated , getStreaks);
+router.delete('/:id', isUserAuthenticated , deleteStreak);
+router.patch('/:id', isUserAuthenticated , updateStreak);
 
 export default router;

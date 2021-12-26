@@ -1,4 +1,5 @@
 import express from 'express';
+import isUserAuthenticated from '../middleware/auth.js';
 
 import auth from "../middleware/auth.js";
 
@@ -12,9 +13,9 @@ import {
 
 const router = express.Router();
 
-router.post('/', createStreakDetail);
-router.get('/:streakId', getStreakDetail);
-router.patch('/:id', updateStreakDetail);
-router.delete('/:streakId', deleteStreakDetail);
+router.post('/', isUserAuthenticated, createStreakDetail);
+router.get('/:streakId', isUserAuthenticated, getStreakDetail);
+router.patch('/:id', isUserAuthenticated, updateStreakDetail);
+router.delete('/:streakId', isUserAuthenticated, deleteStreakDetail);
 
 export default router;
