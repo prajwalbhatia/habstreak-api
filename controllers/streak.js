@@ -4,8 +4,12 @@ import StreakDetail from "../models/streakDetail.js";
 import mongoose from 'mongoose';
 
 export const getStreaks = async (req, res) => {
+  
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
   try {
-    const streaks = await Streak.find();
+    const userId = req.userId;
+    const streaks = await Streak.find({userId});
     res.status(200).json(streaks);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -13,7 +17,11 @@ export const getStreaks = async (req, res) => {
 }
 
 export const createStreak = async (req, res) => {
+
+  if (!req.userId) return res.json({message : 'Unauthenticated'});
+
   const streak = req.body;
+  streak.userId = req.userId;
   const newStreak = new Streak(streak);
   try {
     await newStreak.save();

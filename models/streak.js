@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const streakSchema = mongoose.Schema({
+  userId : {type :  String , require : true},
   title: String,
   days: String,
   description: String,

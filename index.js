@@ -9,6 +9,8 @@ import dotenv from 'dotenv';
 import streakRoutes from './routes/streak.js';
 import streakDetailRoutes from './routes/streakDetail.js';
 import rewardRoute from './routes/reward.js';
+import userRoute from './routes/users.js';
+
 
 const app = express();
 dotenv.config();
@@ -16,11 +18,6 @@ dotenv.config();
 //Middlewares
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
-// app.use(session({
-//   secret: 'thisissecret',
-//   resave: false,
-//   saveUninitialized: false
-// }))
 
 app.use(cors());
 
@@ -28,6 +25,7 @@ app.use(cors());
 app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
 app.use('/reward', rewardRoute);
+app.use('/user', userRoute);
 
 app.get('/', (req, res) => {
   res.send('Welcome to Code snippet');

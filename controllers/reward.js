@@ -2,8 +2,11 @@ import Reward from '../models/reward.js';
 import mongoose from 'mongoose';
 
 export const getRewards = async (req, res) => {
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
   try {
-    const rewards = await Reward.find();
+    const userId = req.userId;
+    const rewards = await Reward.find({ userId });
     res.status(200).json(rewards);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -11,7 +14,10 @@ export const getRewards = async (req, res) => {
 }
 
 export const createReward = async (req, res) => {
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
   const reward = req.body;
+  reward.userId = req.userId;
   const newReward = new Reward(reward);
   try {
     await newReward.save();
@@ -48,7 +54,7 @@ export const deleteReward = async (req, res) => {
 }
 
 export const deleteRewardsBulk = async (req, res) => {
-  const {streakId} = req.params;
+  const { streakId } = req.params;
   try {
     const reward = await Reward.deleteMany({ streakId });
 

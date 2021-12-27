@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const rewardSchema = mongoose.Schema({
+  userId: { type: String, require: true },
   title: String,
   streakId: mongoose.Types.ObjectId,
   date: Date,

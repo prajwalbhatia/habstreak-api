@@ -84,8 +84,12 @@ cron.schedule('01 00 * * *', async () => {
 
 
 export const createStreakDetail = async (req, res) => {
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
   try {
     const streakDetail = req.body;
+    streakDetail.userId = req.userId;
+
     const modifyingDetail = await modifyingStreakDetail(streakDetail);
     const createStreakDetail = new StreakDetail(modifyingDetail);
     await createStreakDetail.save();
