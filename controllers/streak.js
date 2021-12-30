@@ -4,8 +4,7 @@ import StreakDetail from "../models/streakDetail.js";
 import mongoose from 'mongoose';
 
 export const getStreaks = async (req, res) => {
-  
-  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+  if (!req.userId) return res.json({message : 'Unauthenticated'});
 
   try {
     const userId = req.userId;

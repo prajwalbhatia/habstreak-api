@@ -45,11 +45,30 @@ const modifyingStreakDetail = async (streakDetail) => {
 //We want to create a new streak detail every day
 //if that particular streak is capable of (means they have not reached the limit of the days of streak)
 //therefore scheduling a task for everyday 24:00
-cron.schedule('01 00 * * *', async () => {
+cron.schedule('1 0 * * *', async () => {
   try {
+    let userId = '';
+    //We have to check if reward is
+    //earned then we have to update it
+
+    //Getting the rewards
+    const rewards = await Reward.find().lean();
+    userId = rewards.length > 0 && rewards[0].userId;
+
+    const filterRewardData = rewards.map(async (reward) => {
+      if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(moment().format()).format('YYYY-MM-DD') && !reward.rewardEarned)) {
+        reward.rewardEarned = true;
+        await Reward.findByIdAndUpdate(reward._id, reward, { new: true });
+      }
+
+      return reward;
+    });
+
+
     //Finding the streaks
     const streaks = await Streak.find().lean();
     const filterStreakData = []
+    userId = streaks.length > 0 && streaks[0].userId;
     //Filtering the data to get the id of strek and no. of days
     await streaks.forEach(data => {
       filterStreakData.push({ days: data.days, id: JSON.parse(JSON.stringify(data._id)) });
@@ -58,15 +77,16 @@ cron.schedule('01 00 * * *', async () => {
     filterStreakData.map(async (detail) => {
       //Getting the detail of streaks that was filtered
       const streakDetail = await StreakDetail.find({ streakId: detail.id }).lean();
+      // console.log('🚀 ~ file: streakDetail.js ~ line 61 ~ filterStreakData.map ~ streakDetail', streakDetail);
       //We want to create a new detail item if only that particular streak
       //have capability of having more detail item
       if (streakDetail.length < +detail.days) {
-        const lastData = streakDetail[streakDetail.length - 1];
-        let date = new Date();
+        let date = moment().format();
         const detailObj = {
-          date: date.setDate(date.getDate()),
+          date,
           streakId: detail.id,
           rewards: [],
+          userId
         };
         //Creating streak detail
         const modifyingDetail = await modifyingStreakDetail(detailObj);
