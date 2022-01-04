@@ -30,6 +30,7 @@ export const createReward = async (req, res) => {
 
 export const deleteReward = async (req, res) => {
   const rewardId = req.params.id;
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   try {
     const reward = await Reward.findByIdAndDelete(rewardId);
 
@@ -80,7 +81,7 @@ export const deleteRewardsBulk = async (req, res) => {
 
 export const updateReward = async (req, res) => {
   const { id: _id } = req.params;
-  // if (!req.userId) return res.json({ message: 'Unauthenticated' });
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   const reward = req.body;
   if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send(`${_id} is invalid`);
 

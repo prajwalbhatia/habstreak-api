@@ -33,6 +33,7 @@ export const createStreak = async (req, res) => {
 
 export const deleteStreak = async (req, res) => {
   const streakId = req.params.id;
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   try {
     const streak = await Streak.findByIdAndDelete(streakId);
 
@@ -62,7 +63,7 @@ export const deleteStreak = async (req, res) => {
 
 export const updateStreak = async (req, res) => {
   const { id: _id } = req.params;
-  // if (!req.userId) return res.json({ message: 'Unauthenticated' });
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   const streak = req.body;
   if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send(`${_id} is invalid`);
 

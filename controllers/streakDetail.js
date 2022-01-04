@@ -132,7 +132,7 @@ export const getStreakDetail = async (req, res) => {
 
 export const updateStreakDetail = async (req, res) => {
   const { id: _id } = req.params;
-  // if (!req.userId) return res.json({ message: 'Unauthenticated' });
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   const streakDetail = req.body;
   if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send(`${_id} is invalid`);
 
