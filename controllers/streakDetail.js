@@ -55,14 +55,14 @@ cron.schedule('1 0 * * *', async () => {
     const rewards = await Reward.find().lean();
     userId = rewards.length > 0 && rewards[0].userId;
 
-    const filterRewardData = rewards.map(async (reward) => {
-      if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(moment().format()).format('YYYY-MM-DD') && !reward.rewardEarned)) {
-        reward.rewardEarned = true;
-        await Reward.findByIdAndUpdate(reward._id, reward, { new: true });
+    const filterRewardData = await Promise.all(rewards.map(async (reward) => {
+      if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(new Date()).format('YYYY-MM-DD')) && !reward.rewardEarned) {
+        let updatedReward = { ...reward }
+        updatedReward.rewardEarned = true;
+        await Reward.findByIdAndUpdate(reward._id, updatedReward, { new: true });
       }
-
       return reward;
-    });
+    }));
 
 
     //Finding the streaks
