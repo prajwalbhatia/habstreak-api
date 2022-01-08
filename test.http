@@ -3,7 +3,7 @@
 @port = 5000
 @host = {{hostname}}:{{port}}
 @contentType = application/json
-@id = 6109885d3a47696c4acbfb3f
+@id = 61d9a4d7681bfa3703765931
 
 
 ###CREATE A STREAK
@@ -22,6 +22,10 @@ Content-Type: {{contentType}}
 
 ###DELETE STREAK
 DELETE http://{{host}}/streak/{{id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+###DELETE STREAK AND UPDATE REWARD
+DELETE http://{{host}}/streak/{{id}}/deleteAndUpdate HTTP/1.1
 Content-Type: {{contentType}}
 
 ###UPDATE STREAK

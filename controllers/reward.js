@@ -56,6 +56,7 @@ export const deleteReward = async (req, res) => {
 
 export const deleteRewardsBulk = async (req, res) => {
   const { streakId } = req.params;
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   try {
     const reward = await Reward.deleteMany({ streakId });
 
