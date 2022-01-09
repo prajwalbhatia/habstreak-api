@@ -76,7 +76,6 @@ cron.schedule('1 0 * * *', async () => {
     filterStreakData.map(async (detail) => {
       //Getting the detail of streaks that was filtered
       const streakDetail = await StreakDetail.find({ streakId: detail.id }).lean();
-      // console.log('🚀 ~ file: streakDetail.js ~ line 61 ~ filterStreakData.map ~ streakDetail', streakDetail);
       //We want to create a new detail item if only that particular streak
       //have capability of having more detail item
       if (streakDetail.length < +detail.days) {

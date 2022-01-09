@@ -5,6 +5,7 @@ const streakSchema = mongoose.Schema({
   title: String,
   days: String,
   description: String,
+  rewards: [{ type: Object }],
   date: {type : Date , default : Date.now}
 });
 

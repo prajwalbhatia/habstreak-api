@@ -9,7 +9,21 @@ export const getStreaks = async (req, res) => {
 
   try {
     const userId = req.userId;
-    const streaks = await Streak.find({ userId });
+    //Aggregating the reward with streak
+    const streaks = await Streak.aggregate([
+      {
+        $match: { userId: userId }
+      },
+      {
+        $lookup: {
+          from: 'rewards',
+          localField: '_id',
+          foreignField: 'streakId',
+          as: 'rewards'
+        }
+      },
+    ]);
+
     res.status(200).json(streaks);
   } catch (error) {
     res.status(404).json({ message: error.message });
