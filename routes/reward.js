@@ -1,7 +1,5 @@
 import express from 'express';
 
-import auth from "../middleware/auth.js";
-
 //Controllers
 import { createReward, getRewards, updateReward, deleteReward, deleteRewardsBulk } from '../controllers/reward.js';
 import isUserAuthenticated from '../middleware/auth.js';

@@ -1,8 +1,11 @@
 import Streak from '../models/streak.js';
 import Reward from '../models/reward.js';
+import RecentActivity from '../models/recentActivity.js';
 import StreakDetail from "../models/streakDetail.js";
 
 import mongoose from 'mongoose';
+
+import { activityObj } from '../utils.js';
 
 export const getStreaks = async (req, res) => {
   if (!req.userId) return res.json({ message: 'Unauthenticated' });
@@ -31,14 +34,17 @@ export const getStreaks = async (req, res) => {
 }
 
 export const createStreak = async (req, res) => {
-
   if (!req.userId) return res.json({ message: 'Unauthenticated' });
 
   const streak = req.body;
   streak.userId = req.userId;
   const newStreak = new Streak(streak);
+  const activity = activityObj(req.userId, 'create-streak', streak.title, new Date());
+  const newActivity = new RecentActivity(activity);
   try {
     await newStreak.save();
+    await newActivity.save();
+
     res.status(201).json(newStreak);
   } catch (error) {
     console.warn(error.message)
@@ -49,8 +55,12 @@ export const createStreak = async (req, res) => {
 export const deleteStreak = async (req, res) => {
   const streakId = req.params.id;
   if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
   try {
     const streak = await Streak.findByIdAndDelete(streakId);
+    const activity = activityObj(req.userId, 'delete-streak', streak.title, new Date());
+    const newActivity = new RecentActivity(activity);
+    await newActivity.save();
 
     if (!streak) {
       return res.status(404).json({
@@ -96,8 +106,11 @@ export const deleteStreakAndRewardUpdate = async (req, res) => {
       }));
     }
 
-    //Finding the streak and 
+    //Finding the streak and deleting 
     const streak = await Streak.findByIdAndDelete(streakId);
+    const activity = activityObj(req.userId, 'delete-streak', streak.title, new Date());
+    const newActivity = new RecentActivity(activity);
+    await newActivity.save();
 
     if (!streak) {
       return res.status(404).json({
@@ -120,8 +133,6 @@ export const deleteStreakAndRewardUpdate = async (req, res) => {
     });
   }
 }
-
-
 
 export const updateStreak = async (req, res) => {
   const { id: _id } = req.params;

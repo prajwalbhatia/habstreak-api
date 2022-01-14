@@ -1,12 +1,13 @@
 import StreakDetail from "../models/streakDetail.js";
 import Streak from '../models/streak.js';
 import Reward from '../models/reward.js';
+import RecentActivity from '../models/recentActivity.js';
 
 import mongoose from 'mongoose';
 import moment from 'moment';
-
 import cron from 'node-cron';
 
+import { activityObj } from '../utils.js';
 
 /**
  * 
@@ -59,6 +60,10 @@ cron.schedule('1 0 * * *', async () => {
       if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(new Date()).format('YYYY-MM-DD')) && !reward.rewardEarned) {
         let updatedReward = { ...reward }
         updatedReward.rewardEarned = true;
+
+        const activity = activityObj(userId, 'reward-earned', updatedReward.title, new Date());
+        const newActivity = new RecentActivity(activity);
+        await newActivity.save();
         await Reward.findByIdAndUpdate(reward._id, updatedReward, { new: true });
       }
     }));

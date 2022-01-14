@@ -10,7 +10,7 @@ import streakRoutes from './routes/streak.js';
 import streakDetailRoutes from './routes/streakDetail.js';
 import rewardRoute from './routes/reward.js';
 import userRoute from './routes/users.js';
-
+import recentActivityRoute from './routes/recentActivities.js';
 
 const app = express();
 dotenv.config();
@@ -26,6 +26,7 @@ app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
 app.use('/reward', rewardRoute);
 app.use('/user', userRoute);
+app.use('/recentActivities', recentActivityRoute);
 
 app.get('/', (req, res) => {
   res.send('Welcome to Code snippet');

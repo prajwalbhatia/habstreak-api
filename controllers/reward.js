@@ -1,5 +1,9 @@
 import Reward from '../models/reward.js';
+import RecentActivity from '../models/recentActivity.js';
 import mongoose from 'mongoose';
+
+import { activityObj } from '../utils.js';
+
 
 export const getRewards = async (req, res) => {
   if (!req.userId) return res.json({ message: 'Unauthenticated' });
@@ -15,12 +19,16 @@ export const getRewards = async (req, res) => {
 
 export const createReward = async (req, res) => {
   if (!req.userId) return res.json({ message: 'Unauthenticated' });
-
   const reward = req.body;
   reward.userId = req.userId;
   const newReward = new Reward(reward);
+
+  const activity = activityObj(req.userId, 'create-reward', reward.title, new Date());
+  const newActivity = new RecentActivity(activity);
   try {
     await newReward.save();
+    await newActivity.save();
+
     res.status(201).json(newReward);
   } catch (error) {
     console.warn(error.message)
@@ -33,6 +41,9 @@ export const deleteReward = async (req, res) => {
   if (!req.userId) return res.json({ message: 'Unauthenticated' });
   try {
     const reward = await Reward.findByIdAndDelete(rewardId);
+    const activity = activityObj(req.userId, 'delete-reward', reward.title, new Date());
+    const newActivity = new RecentActivity(activity);
+    await newActivity.save();
 
     if (!reward) {
       return res.status(404).json({
