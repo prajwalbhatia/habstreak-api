@@ -21,6 +21,10 @@ app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
 app.use(cors());
 
+app.get('/' , (req , res) => {
+  res.send('HELLO TO HABSTREAK API');
+});
+
 //Routes
 app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
