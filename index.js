@@ -19,7 +19,12 @@ dotenv.config();
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
-app.use(cors());
+app.use(cors({
+  // origin: 'http://localhost:3000',
+  origin: 'https://happy-mahavira-4c2100.netlify.app/',
+}));
+
+app.options('*', cors())
 
 app.get('/' , (req , res) => {
   res.send('HELLO TO HABSTREAK API');
