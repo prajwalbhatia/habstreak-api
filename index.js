@@ -20,13 +20,12 @@ app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
 app.use(cors({
-  // origin: 'http://localhost:3000',
-  origin: 'https://happy-mahavira-4c2100.netlify.app',
+  origin: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://happy-mahavira-4c2100.netlify.app'
 }));
 
 app.options('*', cors())
 
-app.get('/' , (req , res) => {
+app.get('/', (req, res) => {
   res.send('HELLO TO HABSTREAK API');
 });
 
@@ -45,7 +44,8 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 //Connecting to database
-mongoose.connect(process.env.CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+const connectionUrl = process.env.NODE_ENV === 'development' ? process.env.CONNECTION_URL : process.env.CONNECTION_URL_PROD
+mongoose.connect(connectionUrl, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server is running on port : ${PORT}`);
