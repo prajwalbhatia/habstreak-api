@@ -26,8 +26,8 @@ app.use(cors({
 app.options('*', cors())
 
 app.get('/', (req, res) => {
-  res.send('HELLO TO HABSTREAK API');
-});
+  res.send('HELLO TO  HABSTREAK API');           
+}); 
 
 //Routes
 app.use('/streak', streakRoutes);

@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
 const UserScema = mongoose.Schema({
-  googleId: {
-    type: String,
-    required: true
-  },
   name: {
     type: String,
     required: true
@@ -13,10 +9,19 @@ const UserScema = mongoose.Schema({
     type: String,
     required: true
   },
+  password: {
+    type: String,
+    // required: true
+  },
+  fromGoogle: {
+    type: Boolean,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  id: { type: String }
 });
 
 const User = mongoose.model('User', UserScema);
