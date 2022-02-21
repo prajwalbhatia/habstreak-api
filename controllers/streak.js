@@ -3,6 +3,9 @@ import Reward from '../models/reward.js';
 import RecentActivity from '../models/recentActivity.js';
 import StreakDetail from "../models/streakDetail.js";
 
+import moment from 'moment';
+
+
 import mongoose from 'mongoose';
 
 import { activityObj } from '../utils.js';
@@ -39,7 +42,7 @@ export const createStreak = async (req, res) => {
   const streak = req.body;
   streak.userId = req.userId;
   const newStreak = new Streak(streak);
-  const activity = activityObj(req.userId, 'create-streak', streak.title, new Date());
+  const activity = activityObj(req.userId, 'create-streak', streak.title, moment().format() );
   const newActivity = new RecentActivity(activity);
   try {
     await newStreak.save();

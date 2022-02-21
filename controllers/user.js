@@ -26,7 +26,7 @@ export const createUser = async (req, res) => {
 }
 
 export const signUp = async (req, res) => {
-  const { email, password, confirmPassword, firstName, lastName } = req.body;
+  const { email, password, confirmPassword, fullName } = req.body;
 
   try {
     if (!password || password.length === 0) res.status(400).json({ message: "Empty password is not allowed" });
@@ -39,7 +39,7 @@ export const signUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const result = await User.create({ email, password: hashedPassword, name: `${firstName} ${lastName}`, fromGoogle: false });
+    const result = await User.create({ email, password: hashedPassword, name: fullName, fromGoogle: false });
 
     //Saving user detail
     // const newUser = new UserDetail({ email, name: `${firstName} ${lastName}` });
