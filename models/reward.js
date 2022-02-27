@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 const rewardSchema = mongoose.Schema({
-  userId: { type: String, require: true },
-  title: String,
+  userId: { type: String, required: [true , 'Userid is required'] },
+  title: {type : String , required : [true , 'Reward can\'t be created without name']},
   streakId: mongoose.Types.ObjectId,
-  date: Date,
+  date: { type: Date, required: [true, 'Date is required'] },
   rewardEarned: { type: Boolean, default: false },
 });
 

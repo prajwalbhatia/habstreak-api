@@ -1,13 +1,14 @@
 import mongoose from 'mongoose';
 
 const streakSchema = mongoose.Schema({
-  userId : {type :  String , require : true},
-  title: {type :  String , require : true},
-  days: { type: String, require: true },
+  userId: { type: String, required : [true , 'User id is required']},
+  title: { type: String, required : [true , 'Streak can\'t be created without Title']},
+  days: { type: String, required: [true , 'Days are required'] },
   description: String,
+  tag : String,
   rewards: [{ type: Object }],
-  dateFrom: { type: Date , require : true},
-  dateTo: { type: Date , require : true}
+  dateFrom: { type: Date, required : [true , 'Starting date of streak is required']},
+  dateTo: { type: Date, required : [true , 'Ending date of streak is required']}
 });
 
 const Streak = mongoose.model('Streak', streakSchema);

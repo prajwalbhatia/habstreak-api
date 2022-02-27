@@ -67,6 +67,7 @@ cron.schedule('1 0 * * *', async () => {
         await Reward.findByIdAndUpdate(reward._id, updatedReward, { new: true });
       }
     }));
+    
 
 
     //Finding the streaks
@@ -81,20 +82,36 @@ cron.schedule('1 0 * * *', async () => {
     filterStreakData.map(async (detail) => {
       //Getting the detail of streaks that was filtered
       const streakDetail = await StreakDetail.find({ streakId: detail.id }).lean();
+      const lastStreakDetail = streakDetail[streakDetail.length - 1];
+      const streakId = lastStreakDetail.streakId;
+      const descriptionOfLast = lastStreakDetail.description;
+
+      console.log('🚀 ~ file: streakDetail.js ~ line 85 ~ filterStreakData.map ~ streakDetail', streakDetail);
       //We want to create a new detail item if only that particular streak
       //have capability of having more detail item
+      //and if previous day streak detai is not filled that means streak is breaked 
+      //therefore no further detail will be made and streak will be updated with 'unfinished'
       if (streakDetail.length < +detail.days) {
-        let date = moment().format();
-        const detailObj = {
-          date,
-          streakId: detail.id,
-          rewards: [],
-          userId
-        };
-        //Creating streak detail
-        const modifyingDetail = await modifyingStreakDetail(detailObj);
-        const createStreakDetail = new StreakDetail(modifyingDetail);
-        await createStreakDetail.save();
+        if (descriptionOfLast.length > 0)
+        {
+          let date = moment().format();
+          const detailObj = {
+            date,
+            streakId: detail.id,
+            rewards: [],
+            userId
+          };
+          //Creating streak detail
+          const modifyingDetail = await modifyingStreakDetail(detailObj);
+          const createStreakDetail = new StreakDetail(modifyingDetail);
+          await createStreakDetail.save();
+        }
+        else
+        {
+          //UPDATE THE STREAK WITH 'unfinished'
+          const updateObj = { tag : 'unfinished'}
+          await Streak.findByIdAndUpdate(streakId, updateObj, { new: true });
+        }
       }
     })
   } catch (error) {

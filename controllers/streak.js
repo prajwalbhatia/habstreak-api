@@ -4,7 +4,7 @@ import RecentActivity from '../models/recentActivity.js';
 import StreakDetail from "../models/streakDetail.js";
 
 import moment from 'moment';
-
+const ObjectId = mongoose.Types.ObjectId;
 
 import mongoose from 'mongoose';
 
@@ -19,6 +19,33 @@ export const getStreaks = async (req, res) => {
     const streaks = await Streak.aggregate([
       {
         $match: { userId: userId }
+      },
+      {
+        $lookup: {
+          from: 'rewards',
+          localField: '_id',
+          foreignField: 'streakId',
+          as: 'rewards'
+        }
+      },
+    ]);
+
+    res.status(200).json(streaks);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
+
+export const getStreak = async (req, res) => {
+  const streakId = req.params.id;
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
+  try {
+    const userId = req.userId;
+    //Aggregating the reward with streak
+    const streaks = await Streak.aggregate([
+      {
+        $match: { _id: ObjectId(streakId) }
       },
       {
         $lookup: {
@@ -150,6 +177,10 @@ export const updateStreak = async (req, res) => {
         message: `Streak not found with id ${_id}`
       });
     }
+    const activity = activityObj(req.userId, 'update-streak', streak.title, moment().format());
+    const newActivity = new RecentActivity(activity);
+    await newActivity.save();
+    
     res.json(updatedStreak);
   } catch (error) {
     console.warn(error)
