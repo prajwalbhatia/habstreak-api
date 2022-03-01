@@ -4,7 +4,7 @@ const rewardSchema = mongoose.Schema({
   userId: { type: String, required: [true , 'Userid is required'] },
   title: {type : String , required : [true , 'Reward can\'t be created without name']},
   streakId: mongoose.Types.ObjectId,
-  date: { type: Date, required: [true, 'Date is required'] },
+  date: { type: Date },
   rewardEarned: { type: Boolean, default: false },
 });
 

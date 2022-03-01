@@ -48,10 +48,16 @@ export const signUp = async (req, res) => {
     const token = jwt.sign(
       { email: result.email, id: result._id },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.EXPIRES_IN }
+      { expiresIn: "1h" }
     );
 
-    res.status(200).json({ result, token });
+    const refreshToken = jwt.sign(
+      { email: result.email, id: result._id },
+      process.env.REFRESH_JWT_SECRET,
+      { expiresIn: "5h" }
+    );
+
+    res.status(200).json({ result, token, refreshToken });
 
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong' });
@@ -72,13 +78,50 @@ export const signIn = async (req, res) => {
     const token = jwt.sign(
       { email: existingUser.email, id: existingUser._id },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.EXPIRES_IN }
+      { expiresIn: "1h" }
     );
 
-    res.status(200).json({ result: existingUser, token });
+    const refreshToken = jwt.sign(
+      { email: existingUser.email, id: existingUser._id },
+      process.env.REFRESH_JWT_SECRET,
+      { expiresIn: "5h" }
+    );
+
+    res.status(200).json({ result: existingUser, token, refreshToken });
 
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong' });
   }
+}
+
+export const refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  try {
+    const verify = jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET);
+
+    if (verify) {
+      const existingUser = await User.findOne({email : verify.email});
+
+      const token = jwt.sign(
+        { email: verify.email, id: verify.id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      const refreshToken = jwt.sign(
+        { email: verify.email, id: verify.id },
+        process.env.REFRESH_JWT_SECRET,
+        { expiresIn: "5h" }
+      );
+
+      res.status(200).json({ result: existingUser, token, refreshToken });
+    }
+
+  } catch (error) {
+    res.status(400).json({ error })
+  }
+
+
 }
 
