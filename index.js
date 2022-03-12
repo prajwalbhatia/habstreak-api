@@ -3,7 +3,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 
+import errorHandler from './middleware/error.js';
 
 //ROUTES
 import streakRoutes from './routes/streak.js';
@@ -14,6 +16,7 @@ import recentActivityRoute from './routes/recentActivities.js';
 
 const app = express();
 dotenv.config();
+app.use(morgan('dev'))
 
 //Middlewares
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
@@ -26,8 +29,8 @@ app.use(cors({
 app.options('*', cors())
 
 app.get('/', (req, res) => {
-  res.send('HELLO TO  HABSTREAK API');           
-}); 
+  res.send('HELLO TO  HABSTREAK API');
+});
 
 //Routes
 app.use('/streak', streakRoutes);
@@ -36,9 +39,13 @@ app.use('/reward', rewardRoute);
 app.use('/user', userRoute);
 app.use('/recentActivities', recentActivityRoute);
 
-app.get('/', (req, res) => {
-  res.send('Welcome to Code snippet');
-});
+app.use((req , res , next) => {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err); 
+})
+
+app.use(errorHandler);
 
 //Connection url
 const PORT = process.env.PORT || 5000;

@@ -2,118 +2,87 @@ import Reward from '../models/reward.js';
 import RecentActivity from '../models/recentActivity.js';
 import mongoose from 'mongoose';
 
-import { activityObj } from '../utils.js';
+import { activityObj, throwError } from '../utils.js';
+import moment from 'moment';
+import asyncHandler from 'express-async-handler';
 
+export const getRewards = asyncHandler(async (req, res,next) => {
+  if (!req.userId) throwError(next);
 
-export const getRewards = async (req, res) => {
-  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+  const userId = req.userId;
+  const rewards = await Reward.find({ userId });
+  res.status(200).json(rewards);
+});
 
-  try {
-    const userId = req.userId;
-    const rewards = await Reward.find({ userId });
-    res.status(200).json(rewards);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-}
+export const createReward = asyncHandler(async (req, res,next) => {
+  if (!req.userId) return throwError(next);
 
-export const createReward = async (req, res) => {
-  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   const reward = req.body;
-  reward.userId = req.userId;
-  const newReward = new Reward(reward);
 
-  const activity = activityObj(req.userId, 'create-reward', reward.title, new Date());
-  const newActivity = new RecentActivity(activity);
-  try {
+  //Getting the reward to check
+  //if reward of same date and same streak exist or not
+  const rewards = await Reward.find({ streakId: reward.streakId }).lean();
+
+  const filter = rewards.filter((rewardItem) => {
+    if (reward.date === moment(rewardItem.date).format('YYYY-MM-DD'))
+      return reward
+  })
+
+
+  if (filter.length === 0) {
+    reward.userId = req.userId;
+    const newReward = new Reward(reward);
+
+    const activity = activityObj(req.userId, 'create-reward', reward.title, new Date());
+    const newActivity = new RecentActivity(activity);
     await newReward.save();
     await newActivity.save();
 
     res.status(201).json(newReward);
-  } catch (error) {
-    console.warn(error.message)
-    res.status(409).json({ message: error.message });
   }
-}
+  else {
+    throwError(400, 'Reward for this streak on same date already exist', next);
+  }
+})
 
-export const deleteReward = async (req, res) => {
+export const deleteReward = asyncHandler(async (req, res,next) => {
   const rewardId = req.params.id;
-  if (!req.userId) return res.json({ message: 'Unauthenticated' });
-  try {
-    const reward = await Reward.findByIdAndDelete(rewardId);
-    const activity = activityObj(req.userId, 'delete-reward', reward.title, new Date());
-    const newActivity = new RecentActivity(activity);
-    await newActivity.save();
+  if (!req.userId) return throwError(next);
+  const reward = await Reward.findByIdAndDelete(rewardId);
+  const activity = activityObj(req.userId, 'delete-reward', reward.title, new Date());
+  const newActivity = new RecentActivity(activity);
+  await newActivity.save();
 
-    if (!reward) {
-      return res.status(404).json({
-        message: `Reward not found with id ${rewardId}`
-      })
-    }
-
-    res.status(201).json({ message: "Reward deleted successfully" });
-  } catch (error) {
-    console.warn(error)
-    if (error.kind === 'ObjectId' || err.name === 'NotFound') {
-      return res.status(404).json({
-        message: `Reward not found with id ${rewardId}`
-      });
-    }
-    return res.status(500).send({
-      message: `Could not delete the reward with id ${rewardId}`
-    });
+  if (!reward) {
+    throwError(404, `Reward not found with id ${rewardId}`, next);
   }
-}
 
-export const deleteRewardsBulk = async (req, res) => {
+  res.status(201).json({ message: "Reward deleted successfully" });
+});
+
+export const deleteRewardsBulk = asyncHandler(async (req, res,next) => {
   const { streakId } = req.params;
-  if (!req.userId) return res.json({ message: 'Unauthenticated' });
-  try {
-    const reward = await Reward.deleteMany({ streakId });
+  if (!req.userId) return throwError(next);
+  const reward = await Reward.deleteMany({ streakId });
 
-    if (!reward) {
-      return res.status(404).json({
-        message: `Reward not found with id ${streakId}`
-      })
-    }
-
-    res.status(201).json({ message: "Rewards deleted successfully" });
-  } catch (error) {
-    console.warn(error)
-    if (error.kind === 'ObjectId' || err.name === 'NotFound') {
-      return res.status(404).json({
-        message: `Reward not found with id ${streakId}`
-      });
-    }
-    return res.status(500).send({
-      message: `Could not delete the reward with id ${streakId}`
-    });
+  if (!reward) {
+    throwError(404, `Reward not found with id ${streakId}`, next);
   }
-}
 
-export const updateReward = async (req, res) => {
+  res.status(201).json({ message: "Rewards deleted successfully" });
+});
+
+export const updateReward = asyncHandler(async (req, res,next) => {
   const { id: _id } = req.params;
-  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+  if (!req.userId) return throwError(next);
   const reward = req.body;
-  if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send(`${_id} is invalid`);
-
-  try {
-    const updatedReward = await Reward.findByIdAndUpdate(_id, reward, { new: true });
-    if (!updatedReward) {
-      return res.status(404).json({
-        message: `Reward not found with id ${_id}`
-      });
-    }
-    res.json(updatedReward);
-  } catch (error) {
-    console.warn(error)
-    if (error.kind === 'ObjectId') {
-      return res.status(404).json({
-        message: `Reward not found with id ${_id}`
-      });
-    }
-    return res.status(500).send({
-      message: `Error updating reward with id ${_id}`
-    });
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
+    throwError(404, `${_id} is invalid`, next);
   }
-}
+
+  const updatedReward = await Reward.findByIdAndUpdate(_id, reward, { new: true });
+  if (!updatedReward) {
+    throwError(404, `Reward not found with id ${_id}`, next);
+  }
+  res.json(updatedReward);
+});
