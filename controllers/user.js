@@ -123,7 +123,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 
 export const logout = asyncHandler(async (req, res, next) => {
   const { refreshToken } = req.body;
-  if (!req.userId) throwError();
+  if (!req.userId) throwError(next);
 
   const refreshTokens = await RefreshToken.deleteOne({ refreshToken });
   res.status(200).json({ message: 'You logged out successfully' });
