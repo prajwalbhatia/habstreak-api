@@ -13,10 +13,14 @@ import streakDetailRoutes from './routes/streakDetail.js';
 import rewardRoute from './routes/reward.js';
 import userRoute from './routes/users.js';
 import recentActivityRoute from './routes/recentActivities.js';
+import razorPayRoute from "./routes/razorPay.js";
+import path from 'path';
 
+const __dirname = path.resolve();
 const app = express();
 dotenv.config();
 app.use(morgan('dev'))
+
 
 //Middlewares
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
@@ -32,12 +36,17 @@ app.get('/', (req, res) => {
   res.send('HELLO TO  HABSTREAK API');
 });
 
+app.get('/logo.svg', (req, res) => {
+  res.sendFile(path.join(__dirname , 'Logo-Icon.svg'))
+});
+
 //Routes
 app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
 app.use('/reward', rewardRoute);
 app.use('/user', userRoute);
 app.use('/recentActivities', recentActivityRoute);
+app.use('/razorpay', razorPayRoute);
 
 app.use((req , res , next) => {
   const err = new Error('Not Found');

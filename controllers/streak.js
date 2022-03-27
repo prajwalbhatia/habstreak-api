@@ -147,7 +147,7 @@ export const updateStreak = asyncHandler(async (req, res , next) => {
   if (!mongoose.Types.ObjectId.isValid(_id)) throwError(404, `${_id} is invalid`, next);
 
   const updatedStreak = await Streak.findByIdAndUpdate(_id, streak, { new: true });
-  if (!updateStreak) throwError(404, `Streak not found with id ${streakId}`, next);
+  if (!updateStreak) throwError(404, `Streak not found with id ${_id}`, next);
   const activity = activityObj(req.userId, 'update-streak', streak.title, moment().format());
   const newActivity = new RecentActivity(activity);
   await newActivity.save();

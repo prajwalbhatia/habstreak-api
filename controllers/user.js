@@ -6,6 +6,8 @@ import { throwError } from '../utils.js';
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+
 
 let err = {};
 
@@ -120,11 +122,28 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
   });
 })
 
-
 export const logout = asyncHandler(async (req, res, next) => {
   const { refreshToken } = req.body;
   if (!req.userId) throwError(next);
 
   const refreshTokens = await RefreshToken.deleteOne({ refreshToken });
   res.status(200).json({ message: 'You logged out successfully' });
+})
+
+export const updateUser = asyncHandler(async (req, res, next) => {
+  const { email } = req.params;
+  if (!req.userId) {
+    throwError(next);
+  }
+
+  const user = req.body;
+  // if (!mongoose.Types.ObjectId.isValid(id)) throwError(404, `${id} is invalid`, next);
+
+  const updatedUser = await User.findOneAndUpdate(email, user, { new: true });
+  if (!updateUser) throwError(404, `User not found with email ${email}`, next);
+  // const activity = activityObj(req.userId, 'update-streak', streak.title, moment().format());
+  // const newActivity = new RecentActivity(activity);
+  // await newActivity.save();
+
+  res.json(updatedUser);
 })

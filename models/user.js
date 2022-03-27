@@ -21,7 +21,8 @@ const UserScema = mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  id: { type: String }
+  id: { type: String },
+  planType: { type: String, default: "free" }
 });
 
 const User = mongoose.model('User', UserScema);

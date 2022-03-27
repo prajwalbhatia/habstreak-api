@@ -8,12 +8,14 @@ import {
   signUp,
   signIn,
   refreshToken,
-  logout
+  logout,
+  updateUser,
 } from './../controllers/user.js';
 
 const router = express.Router();
 
 router.post('/', createUser);
+router.patch('/:email', isUserAuthenticated, updateUser);
 router.post('/signup', signUp);
 router.post('/signin', signIn);
 router.post('/refreshToken' , refreshToken);
