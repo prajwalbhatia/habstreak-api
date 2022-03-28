@@ -27,7 +27,7 @@ app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://festive-pasteur-8564bb.netlify.app'
+  origin: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://habstreak.com';
 }));
 
 app.options('*', cors())
