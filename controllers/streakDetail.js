@@ -89,7 +89,7 @@ cron.schedule('1 0 * * *', async () => {
       //therefore no further detail will be made and streak will be updated with 'unfinished'
       if (streakDetail.length < +detail.days) {
         if (descriptionOfLast.length > 0 || streakDetail.length === 0) {
-          let date = moment().format();
+          let date = moment().startOf('day').toString();
           const detailObj = {
             date,
             streakId: detail.id,

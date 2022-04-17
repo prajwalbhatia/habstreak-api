@@ -4,7 +4,7 @@ const recentACtivitySchema = mongoose.Schema({
   userId: { type: String, require: true },
   type : String,
   title: String,
-  date: Date,
+  date: String,
 });
 
 const RecentActivity = mongoose.model('RecentActivity', recentACtivitySchema);
