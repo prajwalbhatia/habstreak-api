@@ -22,7 +22,9 @@ const UserScema = mongoose.Schema({
     default: Date.now
   },
   id: { type: String },
-  planType: { type: String, default: "free" }
+  planType: { type: String, default: "free" },
+  orderId: { type: String, default: "" },
+  paymentId: { type: String, default: "" }
 });
 
 const User = mongoose.model('User', UserScema);
