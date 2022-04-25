@@ -13,7 +13,7 @@ const razorPayData = new RazorPay({
 
 
 export const razorPay = asyncHandler(async (req, res, next) => {
-  const amount = 90;
+  const amount = 45;
   const currency = 'INR';
 
   const options = {
