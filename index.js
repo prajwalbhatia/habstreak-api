@@ -40,6 +40,10 @@ app.get('/logo.svg', (req, res) => {
   res.sendFile(path.join(__dirname , 'Logo-Icon.svg'))
 });
 
+app.get('/habstreak_guide.mp4', (req, res) => {
+  res.sendFile(path.join(__dirname, 'habstreak_video.mp4'))
+});
+
 //Routes
 app.use('/streak', streakRoutes);
 app.use('/streakDetail', streakDetailRoutes);
