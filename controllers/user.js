@@ -1,8 +1,9 @@
 import User from '../models/user.js';
 import RefreshToken from '../models/refreshToken.js';
+import VerificationToken from '../models/verificationToken.js';
 
 import asyncHandler from 'express-async-handler';
-import { throwError } from '../utils.js';
+import { generateOtp, mailTrasport, otpTemplate, throwError } from '../utils.js';
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -61,6 +62,13 @@ export const signUp = asyncHandler(async (req, res, next) => {
 
   const result = await User.create({ email, password: hashedPassword, name: fullName, fromGoogle: false });
 
+  //GENERATING OTP
+  const OTP = generateOtp();
+  const verificationToken = new VerificationToken({
+    owner: result._id,
+    token: OTP
+  });
+
   //Saving user detail
   const token = generateToken('token', result);
   const refreshToken = generateToken('refreshToken', result);
@@ -68,7 +76,17 @@ export const signUp = asyncHandler(async (req, res, next) => {
   const tokenObj = { refreshToken };
   const newToken = new RefreshToken(tokenObj);
 
+  await verificationToken.save();
   await newToken.save();
+
+
+  mailTrasport().sendMail({
+    from: 'emailVerification@gmail.com',
+    to: result.email,
+    subject: "Verify your email account",
+    html: otpTemplate(OTP)
+  })
+
 
   res.status(200).json({ result, token, refreshToken });
 
@@ -92,6 +110,44 @@ export const signIn = asyncHandler(async (req, res, next) => {
   await newToken.save();
 
   res.status(200).json({ result: existingUser, token, refreshToken });
+
+})
+
+export const verifyEmail = asyncHandler(async (req, res, next) => {
+  const { userId, otp } = req.body;
+
+  if (!userId || !otp.trim()) throwError(400, 'Invalid request, missing parameters!', next);
+
+  // if (!isValidObjectId(userId))
+  //   throwError(400, 'Invalid User id', next);
+
+  const user = await User.findOne({ _id: userId });
+
+  if (!user) throwError(400, 'User not found', next);
+
+  if (user.verified) throwError(400, 'User already verified', next);
+
+  const token = await VerificationToken.findOne({ owner: user._id })
+  if (!token) throwError(400, 'User not found', next);
+
+  const isMatched = await token.compareToken(otp);
+
+  if (!isMatched) throwError(400, 'Please provide valid otp', next);
+
+  user.verified = true;
+
+  await VerificationToken.findByIdAndDelete(token._id);
+
+  await user.save();
+
+
+  // mailTrasport().sendMail({
+  //   from: 'emailVerification@gmail.com',
+  //   to: user.email,
+  //   subject: "Verify your email account",
+  //   html: ``
+  // })
+  res.status(200).json({ message: 'Your email is verified' , result : user });
 
 })
 

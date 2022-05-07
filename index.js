@@ -27,7 +27,10 @@ app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://habstreak.com'
+  origin: process.env.NODE_ENV === 'development' ?
+    'http://localhost:3000'
+    :
+    'https://habstreak.com'
 }));
 
 app.options('*', cors())
@@ -37,7 +40,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/logo.svg', (req, res) => {
-  res.sendFile(path.join(__dirname , 'Logo-Icon.svg'))
+  res.sendFile(path.join(__dirname, 'Logo-Icon.svg'))
+});
+
+app.get('/habstreak_guide.mp4', (req, res) => {
+  res.sendFile(path.join(__dirname, 'habstreak_video.mp4'))
 });
 
 //Routes
@@ -48,10 +55,10 @@ app.use('/user', userRoute);
 app.use('/recentActivities', recentActivityRoute);
 app.use('/razorpay', razorPayRoute);
 
-app.use((req , res , next) => {
+app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
-  next(err); 
+  next(err);
 })
 
 app.use(errorHandler);
