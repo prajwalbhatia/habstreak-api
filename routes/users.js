@@ -10,6 +10,7 @@ import {
   refreshToken,
   logout,
   updateUser,
+  verifyEmail,
 } from './../controllers/user.js';
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.post('/', createUser);
 router.patch('/:email', isUserAuthenticated, updateUser);
 router.post('/signup', signUp);
 router.post('/signin', signIn);
+router.post('/verifyEmail', verifyEmail);
 router.post('/refreshToken' , refreshToken);
 router.post('/logout' , isUserAuthenticated , logout);
 
