@@ -9,7 +9,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 
-
+import mongodb from 'mongodb';
+const { ObjectId } = mongodb;
 let err = {};
 
 const generateToken = (type, user) => {
@@ -38,7 +39,7 @@ export const createUser = asyncHandler(async (req, res) => {
   const findUser = await User.find({ email });
 
   if (findUser.length === 0) {
-    const newUser = new User({ email, name, fromGoogle: true });
+    const newUser = new User({ email, name, fromGoogle: true , verified : true});
     await newUser.save();
     res.status(201).json(newUser);
   }
@@ -79,14 +80,12 @@ export const signUp = asyncHandler(async (req, res, next) => {
   await verificationToken.save();
   await newToken.save();
 
-
   mailTrasport().sendMail({
     from: 'emailVerification@gmail.com',
     to: result.email,
     subject: "Verify your email account",
     html: otpTemplate(OTP)
   })
-
 
   res.status(200).json({ result, token, refreshToken });
 
@@ -100,16 +99,43 @@ export const signIn = asyncHandler(async (req, res, next) => {
 
   const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
-  if (!isPasswordCorrect) throwError(400, 'Invalid credentials', next);;
+  if (!isPasswordCorrect) throwError(400, 'Invalid credentials', next);
+
+  //GENERATING OTP
+  let verificationToken;
+  let OTP;
+  if (!existingUser.verified) {
+    OTP = generateOtp();
+    verificationToken = new VerificationToken({
+      owner: existingUser._id,
+      token: OTP
+    });
+  }
 
   const token = generateToken('token', existingUser);
   const refreshToken = generateToken('refreshToken', existingUser);
 
   const tokenObj = { refreshToken };
   const newToken = new RefreshToken(tokenObj);
+
+  if (!existingUser.verified)
+    await verificationToken.save();
+
+
   await newToken.save();
 
-  res.status(200).json({ result: existingUser, token, refreshToken });
+  if (!existingUser.verified) {
+    mailTrasport().sendMail({
+      from: 'emailVerification@gmail.com',
+      to: email,
+      subject: "Verify your email account",
+      html: otpTemplate(OTP)
+    })
+  }
+
+  // if (existingUser.verified) {
+    res.status(200).json({ result: existingUser, token, refreshToken });
+  // }
 
 })
 
@@ -121,7 +147,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   // if (!isValidObjectId(userId))
   //   throwError(400, 'Invalid User id', next);
 
-  const user = await User.findOne({ _id: userId });
+  const user = await User.findOne({ _id: ObjectId(userId) });
 
   if (!user) throwError(400, 'User not found', next);
 
@@ -136,10 +162,9 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
 
   user.verified = true;
 
-  await VerificationToken.findByIdAndDelete(token._id);
+  await VerificationToken.findByIdAndDelete({ _id : token._id});
 
   await user.save();
-
 
   // mailTrasport().sendMail({
   //   from: 'emailVerification@gmail.com',
@@ -147,7 +172,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   //   subject: "Verify your email account",
   //   html: ``
   // })
-  res.status(200).json({ message: 'Your email is verified' , result : user });
+  res.status(200).json({ message: 'Your email is verified', result: user });
 
 })
 

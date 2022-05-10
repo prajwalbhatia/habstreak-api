@@ -21,8 +21,8 @@ POST  http://{{host}}/user/verifyEmail HTTP/1.1
 Content-Type: {{contentType}}
 
 {
-  "userId" : "626eb09c9d45eb1e4fa5a619",
-  "otp" : "0629"
+  "userId" : "6276a6feb65c415759b7014e",
+  "otp" : "7226"
 }
 
 ####GET STREAKS
