@@ -158,7 +158,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
 
   const isMatched = await token.compareToken(otp);
 
-  if (!isMatched) throwError(400, 'Please provide valid otp', next);
+  if (!isMatched) throwError(400, 'Please provide valid otp');
 
   user.verified = true;
 

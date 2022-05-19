@@ -27,7 +27,7 @@ export const throwError = (code = 401, message = 'Unauthentcated', next) => {
   let err = {};
   err.status = code;
   err.message = message;
-  return next(err);
+  return next ?  next(err) : err;
 }
 
 /**
