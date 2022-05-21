@@ -81,7 +81,7 @@ export const signUp = asyncHandler(async (req, res, next) => {
   await newToken.save();
 
   mailTrasport().sendMail({
-    from: 'emailVerification@gmail.com',
+    from: '"Habstreak" <support@habstreak.com>',
     to: result.email,
     subject: "Verify your email account",
     html: otpTemplate(OTP)
@@ -110,6 +110,7 @@ export const signIn = asyncHandler(async (req, res, next) => {
       owner: existingUser._id,
       token: OTP
     });
+    await verificationToken.save();
   }
 
   const token = generateToken('token', existingUser);
@@ -118,15 +119,14 @@ export const signIn = asyncHandler(async (req, res, next) => {
   const tokenObj = { refreshToken };
   const newToken = new RefreshToken(tokenObj);
 
-  if (!existingUser.verified)
-    await verificationToken.save();
+  // if (!existingUser.verified)
 
 
   await newToken.save();
 
   if (!existingUser.verified) {
     mailTrasport().sendMail({
-      from: 'emailVerification@gmail.com',
+      from: '"Habstreak" <support@habstreak.com>',
       to: email,
       subject: "Verify your email account",
       html: otpTemplate(OTP)
@@ -167,7 +167,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   await user.save();
 
   // mailTrasport().sendMail({
-  //   from: 'emailVerification@gmail.com',
+  //   from: 'support@habstreak.com',
   //   to: user.email,
   //   subject: "Verify your email account",
   //   html: ``
