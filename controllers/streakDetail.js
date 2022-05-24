@@ -43,7 +43,7 @@ const modifyingStreakDetail = asyncHandler(async (streakDetail) => {
 //We want to create a new streak detail every day
 //if that particular streak is capable of (means they have not reached the limit of the days of streak)
 //therefore scheduling a task for everyday 24:00
-cron.schedule('1 0 * * *', async () => {
+cron.schedule('5 0 * * *', async () => {
   try {
     let userId = '';
     //We have to check if reward is
@@ -90,6 +90,7 @@ cron.schedule('1 0 * * *', async () => {
       if (streakDetail.length < +detail.days) {
         if (descriptionOfLast.length > 0 || streakDetail.length === 0) {
           let date = moment().startOf('day').toString();
+          console.log('🚀 ~ file: streakDetail.js ~ line 93 ~ filterStreakData.map ~ date', date);
           const detailObj = {
             date,
             streakId: detail.id,
@@ -98,7 +99,9 @@ cron.schedule('1 0 * * *', async () => {
           };
           //Creating streak detail
           const modifyingDetail = await modifyingStreakDetail(detailObj);
+          console.log('🚀 ~ file: streakDetail.js ~ line 102 ~ filterStreakData.map ~ modifyingDetail', modifyingDetail);
           const createStreakDetail = new StreakDetail(modifyingDetail);
+          console.log('🚀 ~ file: streakDetail.js ~ line 104 ~ filterStreakData.map ~ createStreakDetail', createStreakDetail);
           await createStreakDetail.save();
         }
         else {
