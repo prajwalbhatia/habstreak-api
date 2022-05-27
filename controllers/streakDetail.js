@@ -89,7 +89,9 @@ cron.schedule('5 0 * * *', async () => {
       //therefore no further detail will be made and streak will be updated with 'unfinished'
       if (streakDetail.length < +detail.days) {
         if (descriptionOfLast.length > 0 || streakDetail.length === 0) {
-          let date = moment().startOf('day').toString();
+          // let date = moment().startOf('day').toString();
+          let date = moment().format().toString();
+
           console.log('🚀 ~ file: streakDetail.js ~ line 93 ~ filterStreakData.map ~ date', date);
           const detailObj = {
             date,

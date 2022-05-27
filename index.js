@@ -14,6 +14,8 @@ import rewardRoute from './routes/reward.js';
 import userRoute from './routes/users.js';
 import recentActivityRoute from './routes/recentActivities.js';
 import razorPayRoute from "./routes/razorPay.js";
+import supportRoute from "./routes/support.js";
+
 import path from 'path';
 
 const __dirname = path.resolve();
@@ -29,6 +31,7 @@ app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 app.use(cors({
   origin: process.env.NODE_ENV === 'development' ?
     'http://localhost:3000'
+    // 'http://192.168.1.43:3000'
     :
     'https://habstreak.com'
 }));
@@ -54,6 +57,7 @@ app.use('/reward', rewardRoute);
 app.use('/user', userRoute);
 app.use('/recentActivities', recentActivityRoute);
 app.use('/razorpay', razorPayRoute);
+app.use('/support', supportRoute);
 
 app.use((req, res, next) => {
   const err = new Error('Not Found');
