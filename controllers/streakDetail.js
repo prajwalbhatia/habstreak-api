@@ -43,7 +43,7 @@ const modifyingStreakDetail = asyncHandler(async (streakDetail) => {
 //We want to create a new streak detail every day
 //if that particular streak is capable of (means they have not reached the limit of the days of streak)
 //therefore scheduling a task for everyday 24:00
-cron.schedule('5 0 * * *', async () => {
+cron.schedule('1 0 * * *', async () => {
   try {
     let userId = '';
     //We have to check if reward is
