@@ -21,15 +21,18 @@ const UserScema = mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  verified : {
-    type : Boolean,
-    default : false,
-    required : true
+  verified: {
+    type: Boolean,
+    default: false,
+    required: true
   },
   id: { type: String },
   planType: { type: String, default: "free" },
   orderId: { type: String, default: "" },
-  paymentId: { type: String, default: "" }
+  paymentId: { type: String, default: "" },
+  startTime: { type: String, default: "" },
+  endTime: { type: String, default: "" }
+
 });
 
 const User = mongoose.model('User', UserScema);

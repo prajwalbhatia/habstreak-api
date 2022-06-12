@@ -7,9 +7,11 @@ import { generateOtp, mailTrasport, otpTemplate, throwError } from '../utils.js'
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 
 import mongodb from 'mongodb';
+import moment from 'moment';
+import cron from 'node-cron';
+
 const { ObjectId } = mongodb;
 let err = {};
 
@@ -39,7 +41,7 @@ export const createUser = asyncHandler(async (req, res) => {
   const findUser = await User.find({ email });
 
   if (findUser.length === 0) {
-    const newUser = new User({ email, name, fromGoogle: true , verified : true});
+    const newUser = new User({ email, name, fromGoogle: true, verified: true });
     await newUser.save();
     res.status(201).json(newUser);
   }
@@ -134,7 +136,7 @@ export const signIn = asyncHandler(async (req, res, next) => {
   }
 
   // if (existingUser.verified) {
-    res.status(200).json({ result: existingUser, token, refreshToken });
+  res.status(200).json({ result: existingUser, token, refreshToken });
   // }
 
 })
@@ -162,7 +164,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
 
   user.verified = true;
 
-  await VerificationToken.findByIdAndDelete({ _id : token._id});
+  await VerificationToken.findByIdAndDelete({ _id: token._id });
 
   await user.save();
 
@@ -228,3 +230,35 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   res.json(updatedUser);
 })
+
+export const checkUserExist = asyncHandler(async (req, res, next) => {
+  const {email} = req.body;
+  const users = await User.find();
+
+  const filtered = users.filter((user) => user.email === email);
+  let ifExist = filtered.length > 0 ? true : false;
+  res.status(200).json(ifExist);
+})
+
+cron.schedule('1 0 * * *', async () => {
+  try {
+    //Getting users
+    const users = await User.find().lean();
+
+    await Promise.all(users.map(async (user) => {
+      if (user.endTime.length > 0) {
+        let currentDate = moment().endOf('day').format();
+        if (moment(currentDate).isAfter(moment(user.endTime))) {
+          const updateObj = { planType : "free" , startTime : "" , endTime : "" , orderId : "" , paymentId  : "" }
+          await User.findByIdAndUpdate(user._id, updateObj, { new: true });
+        }
+      }
+    }));
+
+  } catch (error) {
+    console.warn(error._message)
+  }
+}, {
+  scheduled: true,
+  timezone: "Asia/Kolkata"
+});

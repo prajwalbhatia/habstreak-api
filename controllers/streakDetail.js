@@ -92,7 +92,6 @@ cron.schedule('1 0 * * *', async () => {
           // let date = moment().startOf('day').toString();
           let date = moment().format().toString();
 
-          console.log('🚀 ~ file: streakDetail.js ~ line 93 ~ filterStreakData.map ~ date', date);
           const detailObj = {
             date,
             streakId: detail.id,
@@ -101,9 +100,7 @@ cron.schedule('1 0 * * *', async () => {
           };
           //Creating streak detail
           const modifyingDetail = await modifyingStreakDetail(detailObj);
-          console.log('🚀 ~ file: streakDetail.js ~ line 102 ~ filterStreakData.map ~ modifyingDetail', modifyingDetail);
           const createStreakDetail = new StreakDetail(modifyingDetail);
-          console.log('🚀 ~ file: streakDetail.js ~ line 104 ~ filterStreakData.map ~ createStreakDetail', createStreakDetail);
           await createStreakDetail.save();
         }
         else {
