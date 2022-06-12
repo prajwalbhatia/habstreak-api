@@ -171,7 +171,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   // mailTrasport().sendMail({
   //   from: 'support@habstreak.com',
   //   to: user.email,
-  //   subject: "Verify your email account",
+  //   subject: "Verify your email account"
   //   html: ``
   // })
   res.status(200).json({ message: 'Your email is verified', result: user });
