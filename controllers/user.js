@@ -50,6 +50,15 @@ export const createUser = asyncHandler(async (req, res) => {
   }
 });
 
+export const getUser = asyncHandler(async (req, res) => {
+  const { email } = req.params;
+  const findUser = await User.findOne({ email });
+
+  if (findUser) {
+    res.status(201).json(findUser);
+  }
+});
+
 export const signUp = asyncHandler(async (req, res, next) => {
   const { email, password, confirmPassword, fullName } = req.body;
 
@@ -97,7 +106,9 @@ export const signIn = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   const existingUser = await User.findOne({ email });
 
-  if (!existingUser) throwError(400, 'User doesn\'t exists', next);;
+  if (!existingUser) throwError(400, 'User doesn\'t exists', next);
+
+  if (existingUser && existingUser.fromGoogle) throwError(400, 'Same user is already logged in through Google', next)
 
   const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
@@ -195,7 +206,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 
     await RefreshToken.deleteOne({ refreshToken });
 
-    const tokenObj = { refreshToken: refreshTokens[0].refreshToken };
+    const tokenObj = { refreshToken: refreshTokens[0]?.refreshToken };
     const tokenForDb = new RefreshToken(tokenObj);
 
     await tokenForDb.save();
@@ -209,7 +220,7 @@ export const logout = asyncHandler(async (req, res, next) => {
   const { refreshToken } = req.body;
   if (!req.userId) throwError(next);
 
-  const refreshTokens = await RefreshToken.deleteOne({ refreshToken });
+  await RefreshToken.deleteOne({ refreshToken });
   res.status(200).json({ message: 'You logged out successfully' });
 })
 
@@ -220,19 +231,14 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   }
 
   const user = req.body;
-  // if (!mongoose.Types.ObjectId.isValid(id)) throwError(404, `${id} is invalid`, next);
-
-  const updatedUser = await User.findOneAndUpdate(email, user, { new: true });
+  const updatedUser = await User.findOneAndUpdate({email}, user, { new: true });
   if (!updateUser) throwError(404, `User not found with email ${email}`, next);
-  // const activity = activityObj(req.userId, 'update-streak', streak.title, moment().format());
-  // const newActivity = new RecentActivity(activity);
-  // await newActivity.save();
 
   res.json(updatedUser);
 })
 
 export const checkUserExist = asyncHandler(async (req, res, next) => {
-  const {email} = req.body;
+  const { email } = req.body;
   const users = await User.find();
 
   const filtered = users.filter((user) => user.email === email);
@@ -249,7 +255,7 @@ cron.schedule('1 0 * * *', async () => {
       if (user.endTime.length > 0) {
         let currentDate = moment().endOf('day').format();
         if (moment(currentDate).isAfter(moment(user.endTime))) {
-          const updateObj = { planType : "free" , startTime : "" , endTime : "" , orderId : "" , paymentId  : "" }
+          const updateObj = { planType: "free", startTime: "", endTime: "", orderId: "", paymentId: "" }
           await User.findByIdAndUpdate(user._id, updateObj, { new: true });
         }
       }
