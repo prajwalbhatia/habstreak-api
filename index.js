@@ -28,12 +28,21 @@ app.use(morgan('dev'))
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
+let domains = ['http://192.168.1.49:3000', 'http://localhost:3000']
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'development' ?
-    'http://localhost:3000'
-    // 'http://192.168.1.43:3000'
-    :
-    'https://habstreak.com'
+  origin:
+    process.env.NODE_ENV === 'development'
+      ?
+      domains
+      :
+      (
+        process.env.NODE_ENV === 'pre-production'
+          ?
+          'https://habstreak-preprod.netlify.app/'
+          :
+          'https://habstreak.com'
+      )
 }));
 
 app.options('*', cors())
@@ -71,7 +80,19 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 //Connecting to database
-const connectionUrl = process.env.NODE_ENV === 'development' ? process.env.CONNECTION_URL : process.env.CONNECTION_URL_PROD
+const connectionUrl =
+  process.env.NODE_ENV === 'development'
+    ?
+    process.env.CONNECTION_URL
+    :
+    (
+      process.env.NODE_ENV === 'pre-production'
+        ?
+        process.env.CONNECTION_URL_PRE_PROD
+        :
+        process.env.CONNECTION_URL_PROD
+    )
+
 mongoose.connect(connectionUrl, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(PORT, () => {

@@ -32,7 +32,6 @@ export const razorPay = asyncHandler(async (req, res, next) => {
 
   try {
     const response = await razorPayData.orders.create(options);
-    console.log('🚀 ~ file: razorPay.js ~ line 29 ~ razorPay ~ response', response);
     res.json({
       id: response.id,
       currency: response.currency,
