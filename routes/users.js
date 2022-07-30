@@ -11,7 +11,8 @@ import {
   updateUser,
   verifyEmail,
   checkUserExist,
-  getUser
+  getUser,
+  checkUserExistFromGoogle
 } from './../controllers/user.js';
 
 const router = express.Router();
@@ -19,6 +20,7 @@ const router = express.Router();
 router.post('/', createUser);
 router.get('/:email', getUser);
 router.post('/check' , checkUserExist)
+router.post('/checkFromGoogle', checkUserExistFromGoogle)
 router.patch('/:email', isUserAuthenticated, updateUser);
 router.post('/signup', signUp);
 router.post('/signin', signIn);

@@ -246,6 +246,21 @@ export const checkUserExist = asyncHandler(async (req, res, next) => {
   res.status(200).json(ifExist);
 })
 
+export const checkUserExistFromGoogle = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  const users = await User.find();
+  let userExistFromGoogle = null;
+
+  const filtered = users.filter((user) => user.email === email);
+
+  if(filtered.length > 0)
+  {
+    userExistFromGoogle = filtered[0].fromGoogle;
+  }
+
+  res.status(200).json(userExistFromGoogle);
+})
+
 cron.schedule('1 0 * * *', async () => {
   try {
     //Getting users
