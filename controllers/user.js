@@ -152,13 +152,43 @@ export const signIn = asyncHandler(async (req, res, next) => {
 
 })
 
+export const resendOtp = asyncHandler(async (req , res , next) => {
+  const { userId } = req.body;
+  
+  if (!userId) throwError(400, 'Invalid request, missing parameters!', next);
+
+  const user = await User.findOne({ _id: ObjectId(userId) });
+  if (!user) throwError(400, 'User not found', next);
+  if (user.verified) throwError(400, 'User already verified', next);
+
+  await VerificationToken.findByIdAndDelete({ _id: user._id });
+
+  let verificationToken;
+  let OTP;
+  // if (!user.verified) {
+    OTP = generateOtp();
+    verificationToken = new VerificationToken({
+      owner: user._id,
+      token: OTP
+    });
+    await verificationToken.save();
+
+  mailTrasport().sendMail({
+    from: '"Habstreak" <support@habstreak.com>',
+    to: user.email,
+    subject: "Verify your email account",
+    html: otpTemplate(OTP)
+  })
+
+  res.status(200).json({ message: 'OTP IS SENT' });
+
+  // }
+})
+
 export const verifyEmail = asyncHandler(async (req, res, next) => {
   const { userId, otp } = req.body;
 
   if (!userId || !otp.trim()) throwError(400, 'Invalid request, missing parameters!', next);
-
-  // if (!isValidObjectId(userId))
-  //   throwError(400, 'Invalid User id', next);
 
   const user = await User.findOne({ _id: ObjectId(userId) });
 

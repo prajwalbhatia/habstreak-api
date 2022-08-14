@@ -12,7 +12,8 @@ import {
   verifyEmail,
   checkUserExist,
   getUser,
-  checkUserExistFromGoogle
+  checkUserExistFromGoogle,
+  resendOtp
 } from './../controllers/user.js';
 
 const router = express.Router();
@@ -25,6 +26,7 @@ router.patch('/:email', isUserAuthenticated, updateUser);
 router.post('/signup', signUp);
 router.post('/signin', signIn);
 router.post('/verifyEmail', verifyEmail);
+router.post('/resendOtp' , resendOtp);
 router.post('/refreshToken' , refreshToken);
 router.post('/logout' , isUserAuthenticated , logout);
 
