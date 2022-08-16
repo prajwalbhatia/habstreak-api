@@ -30,21 +30,6 @@ app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
 
 let domains = ['http://192.168.29.23:3000' , 'http://192.168.1.49:3000', 'http://localhost:3000', 'https://habstreak-preprod.netlify.app', 'https://habstreak.com'];
 
-// app.use(cors({
-//   origin:
-//     process.env.NODE_ENV === 'development'
-//       ?
-//       domains
-//       :
-//       (
-//         process.env.NODE_ENV === 'pre-production'
-//           ?
-//           'https://habstreak-preprod.netlify.app/'
-//           :
-//           'https://habstreak.com'
-//       )
-// }));
-
 app.use(cors({
   origin: domains
 }));

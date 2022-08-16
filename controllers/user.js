@@ -20,7 +20,7 @@ const generateToken = (type, user) => {
     const token = jwt.sign(
       { email: user.email, id: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      // { expiresIn: "90d" }
     );
 
     return token
@@ -230,7 +230,12 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 
 
   jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET, async (err, user) => {
-    err && console.log(err);
+
+    if(err)
+    {
+      throwError(403, 'Token is Expired', next);
+      return;
+    }
     const newToken = generateToken('token', { email: user.email, _id: user.id });
     const newRefreshToken = generateToken('refreshToken', { email: user.email, _id: user.id });
 
