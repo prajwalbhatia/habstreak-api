@@ -131,7 +131,7 @@ cron.schedule('1 0 * * *', async () => {
         if (streakId)
           streaks = await Streak.find({ _id: streakId }).lean();
 
-        if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(new Date()).format('YYYY-MM-DD')) && !reward.rewardEarned && streakId && !streaks[0].tag) {
+        if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(new Date()).format('YYYY-MM-DD')) && !reward.rewardEarned && streakId && streaks && !streaks[0].tag) {
           let updatedReward = { ...reward }
           updatedReward.rewardEarned = true;
 
