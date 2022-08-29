@@ -122,23 +122,31 @@ cron.schedule('1 0 * * *', async () => {
 
       //Getting the rewards
       const rewards = await Reward.find().lean();
+
       //userId = rewards.length > 0 && rewards[0].userId;
 
       await Promise.all(rewards.map(async (reward) => {
+
         let streakId = reward.streakId;
+
         let streaks = null;
 
         if (streakId)
-          streaks = await Streak.find({ _id: streakId }).lean();
+          streaks = await Streak.find({ _id: mongoose.Types.ObjectId(streakId) }).lean();
 
-        if (moment(moment(reward.date).format('YYYY-MM-DD')).isBefore(moment(new Date()).format('YYYY-MM-DD')) && !reward.rewardEarned && streakId && streaks && !streaks[0].tag) {
+
+
+        if (moment(moment(reward.date).format('YYYY-MM-DD')).isSameOrBefore(moment(new Date()).format('YYYY-MM-DD')) && !reward.rewardEarned && streakId && streaks && !streaks[0].tag) {
+
           let updatedReward = { ...reward }
           updatedReward.rewardEarned = true;
 
           const activity = activityObj(reward.userId, 'reward-earned', updatedReward.title, new Date());
           const newActivity = new RecentActivity(activity);
           await newActivity.save();
-          await Reward.findByIdAndUpdate(reward._id, updatedReward, { new: true });
+          await Reward.findByIdAndUpdate({_id : mongoose.Types.ObjectId(reward._id)}, updatedReward, { new: true });
+
+
         }
       }));
     })
