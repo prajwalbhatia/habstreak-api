@@ -67,6 +67,7 @@ app.use(errorHandler);
 
 //Connection url
 const PORT = process.env.PORT || 5000;
+const host = '0.0.0.0';
 
 //Connecting to database
 const connectionUrl =
@@ -84,7 +85,7 @@ const connectionUrl =
 
 mongoose.connect(connectionUrl, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(PORT, "0.0.0.0", () => {
+    app.listen(PORT, host, () => {
       console.log(`Server is running on port : ${PORT}`);
     })
   })
