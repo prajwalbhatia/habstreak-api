@@ -1,26 +1,36 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import { throwError } from "../utils.js";
 
 const isUserAuthenticated = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    const isCustomAuth = token.length < 500;
-    let decodedData;
+    const token = req.cookies["x-token"];
 
-    if (token && isCustomAuth) {
-      decodedData = jwt.verify(token, process.env.JWT_SECRET)
-      req.userId = decodedData.id;
-    }
-    else {
-      decodedData = jwt.decode(token);
-      req.userId = decodedData.sub;
-    }
+    if (token) {
+      const decodeToken = jwt.decode(token);
+      const currentDate = new Date();
 
-    next();
+      if (decodeToken.exp && decodeToken.exp * 1000 < currentDate.getTime()) {
+        throwError(403, "Access token expired. Please re-authenticate.", next);
+      } else {
+        const isCustomAuth = token?.length < 500;
+        let decodedData;
+
+        if (token && isCustomAuth) {
+          decodedData = jwt.verify(token, process.env.JWT_SECRET);
+          req.userId = decodedData.id;
+        } else {
+          decodedData = jwt.decode(token);
+          req.userId = decodedData.sub;
+        }
+        next();
+      }
+    } else {
+      throwError(401, "Unauthorized", next);
+    }
   } catch (error) {
-  console.log('🚀 ~ file: auth.js ~ line 20 ~ isUserAuthenticated ~ error', error);
-
+    console.log("🚀 ~ isUserAuthenticated ~ error:", error);
+    throwError(401, error, next);
   }
-
-}
+};
 
 export default isUserAuthenticated;

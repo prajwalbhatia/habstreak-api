@@ -13,11 +13,19 @@ import {
   checkUserExist,
   getUser,
   checkUserExistFromGoogle,
-  resendOtp
+  resendOtp,
+  generate2faOtp,
+  verify2faOtp,
+  validate2faOtp,
+  disable2faOtp
 } from './../controllers/user.js';
 
 const router = express.Router();
 
+router.post('/otp/generate', isUserAuthenticated , generate2faOtp);
+router.post('/otp/verify', isUserAuthenticated , verify2faOtp);
+router.post('/otp/validate', isUserAuthenticated , validate2faOtp);
+router.post('/otp/disable', isUserAuthenticated , disable2faOtp);
 router.post('/', createUser);
 router.get('/:email', getUser);
 router.post('/check' , checkUserExist)

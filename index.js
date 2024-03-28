@@ -4,6 +4,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
+import * as cookieParser from 'cookie-parser'
 
 import errorHandler from './middleware/error.js';
 
@@ -27,6 +28,7 @@ app.use(morgan('dev'))
 //Middlewares
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
+app.use(cookieParser.default())
 
 let domains = ['http://192.168.29.23:3000' , 'http://192.168.1.49:3000', 'http://localhost:3000', 'https://habstreak-preprod.netlify.app', 'https://habstreak.com'];
 
