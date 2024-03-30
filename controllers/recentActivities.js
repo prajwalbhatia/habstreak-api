@@ -8,7 +8,9 @@ export const getRecentActivities = asyncHandler(async (req, res , next) => {
 
   const userId = req.userId;
   const recentActivities = await RecentActivity.find({ userId });
-  res.status(200).json(recentActivities);
+
+  const sortedData = recentActivities.sort((a, b) => new Date(b.date) - new Date(a.date));
+  res.status(200).json(sortedData);
 });
 
 
