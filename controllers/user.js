@@ -24,6 +24,7 @@ import cron from "node-cron";
 const { ObjectId } = mongodb;
 const { encode } = hiBase32;
 
+import { io } from "../index.js";
 let err = {};
 
 const generateRandomBase32 = () => {
@@ -554,6 +555,8 @@ cron.schedule(
                 paymentId: "",
               };
               await User.findByIdAndUpdate(user._id, updateObj, { new: true });
+              io.emit("user-update");
+
             }
           }
         })
