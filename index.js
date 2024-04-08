@@ -28,13 +28,22 @@ app.use(morgan('dev'))
 //Middlewares
 app.use(bodyParser.json({ limit: "3mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "3mb", extended: true }));
-app.use(cookieParser.default())
+app.use(cookieParser.default());
 
-let domains = ['http://192.168.29.23:3000' , 'http://192.168.1.49:3000', 'http://localhost:3000', 'https://habstreak-preprod.netlify.app', 'https://habstreak.com'];
+let domains = [
+  "http://192.168.29.23:3000",
+  "http://192.168.1.49:3000",
+  "http://localhost:3000",
+  "https://habstreak-preprod.netlify.app",
+  "https://habstreak.com",
+];
 
-app.use(cors({
-  origin: domains
-}));
+app.use(
+  cors({
+    origin: domains,
+    credentials : true
+  })
+);
 
 app.options('*', cors())
 
